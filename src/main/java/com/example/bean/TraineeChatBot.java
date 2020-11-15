@@ -20,8 +20,8 @@ public class TraineeChatBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        requestDispatcher.dispatch(update);
 
+        requestDispatcher.dispatch(update);
     }
 
     @Override

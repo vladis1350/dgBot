@@ -1,15 +1,41 @@
 package com.example.enums;
 
+
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public enum BotCommand {
     START("/start"),
-    HELP("/help"),
     SETTING("/settings"),
-    NONE("/none");
+    NONE("/none"),
+    MY_CARTS("Мои карты"),
+    PARTICIPANT_PROGRAMS("Участники программы"),
+    CATALOG("Каталог"),
+    SHARES("Акции"),
+    MY_INFORMATION("Моя информация"),
+    DELIVERY("Доставка"),
+    HELP("Помощь"),
+    SEND_PHONE_NUMBER,
+    MAIN_MENU,
+    INFORMATION_CART,
+    LIST_BY_CATEGORY,
+    WHAT_DISCOUNT,
+    POPULAR_PRODUCTS,
+    CATEGORIZATION,
+    GET_DISCHARGE,
+    INPUT_DATA,
+    OPERATIONS,
+    ASK_AGE,
+    GET_BTN_DISCHARGE,
+    LEAVE_FEEDBACK,
+    FEEDBACK_FILLED,
+    QUANTITY_BALLS;
 
     String command;
+
+    BotCommand() {
+
+    }
 
     public String getCommand() {
         return command;
@@ -19,34 +45,5 @@ public enum BotCommand {
         this.command = command;
     }
 
-    private BotCommand getCommand(Update update) {
-        if (update.hasMessage()) {
-            Message message = update.getMessage();
-            if (message != null && message.hasText()) {
-                String msgText = message.getText();
-                if (msgText.startsWith(BotCommand.HELP.getCommand())) {
-                    return BotCommand.HELP;
-                } else if (msgText.startsWith(BotCommand.START.getCommand())) {
-                    return BotCommand.START;
-                } else if (msgText.startsWith(BotCommand.SETTING.getCommand())) {
-                    return BotCommand.SETTING;
-                }
-            }
-        }
-        return BotCommand.NONE;
-    }
-
-    public void dispatch(Update update) {
-        switch (getCommand(update)) {
-            case HELP:
-                break;
-            case START:
-                break;
-            case SETTING:
-                break;
-            case NONE:
-                break;
-        }
-    }
 
 }
