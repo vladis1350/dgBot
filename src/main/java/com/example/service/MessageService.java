@@ -3,23 +3,31 @@ package com.example.service;
 import com.example.bean.TraineeChatBot;
 import com.example.buttonHandler.ButtonHandler;
 import com.example.buttonHandler.MainMenuButton;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendContact;
 import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.lang.reflect.Array;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 public class MessageService {
     @Autowired
     TraineeChatBot traineeChatBot;
@@ -46,6 +54,41 @@ public class MessageService {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+        String dataForQrCode = getUserData(message);
+        getQR(dataForQrCode);
+        sendPhoto(message.getChatId());
+    }
+
+    @SneakyThrows
+    public void sendPhoto(long chatId) {
+        File image = ResourceUtils.getFile("QRCode.png");
+        SendPhoto sendPhoto = new SendPhoto()
+                .setPhoto(image)
+                .setChatId(chatId);
+        traineeChatBot.execute(sendPhoto);
+    }
+
+    public String getUserData(Message message) {
+        String str = "";
+        if (message.getFrom().getLastName() != null) {
+            str = message.getFrom().getFirstName() + " " + message.getFrom().getLastName();
+        } else {
+            str = message.getFrom().getFirstName();
+        }
+        return str;
+    }
+
+    @SneakyThrows
+    public void getQR(String qrCodeData) {
+        String filePath = "QRCode.png";
+        Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<>();
+        hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
+
+        QrCodeGenerator.createQRCode(qrCodeData, filePath, 200, 200);
+        log.info("QR Code image created successfully!");
+
+        log.info("Data read from QR Code: "
+                + QrCodeGenerator.readQRCode(filePath, hintMap));
     }
 
     @SneakyThrows
